@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smart Downloads Organizer — ChlaudeHelpMe</title>
+<meta name="description" content="A background service that watches Downloads and sorts files by type and inferred purpose." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="../index.html#setup">Setup</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="project-hero">
+  <div class="prose">
+    <div class="num">Project 02</div>
+    <h1>Smart Downloads Organizer</h1>
+    <p class="lede">Tame your <code>~/Downloads</code> folder. A background service watches for new files, sorts them by type and inferred purpose, and routes ambiguous ones past Claude for a one-line classification. Nothing leaves your machine except the filename and a short description — never file contents — and only when you opt in.</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <h2>What you'll need</h2>
+    <ul>
+      <li>macOS or Linux.</li>
+      <li>Python 3.11+.</li>
+      <li>Optional: an Anthropic API key (only needed if you want Claude to classify ambiguous files). Without it, the tool falls back to extension-based rules.</li>
+    </ul>
+
+    <h2>Setup walkthrough</h2>
+    <ol class="steps">
+      <li><strong>Make and enter the project folder:</strong>
+        <pre><code>mkdir -p ~/projects/downloads-organizer &amp;&amp; cd ~/projects/downloads-organizer
+git init</code></pre>
+      </li>
+      <li><strong>Create the secrets file</strong> (only if you want AI classification):
+        <pre><code>touch .env &amp;&amp; chmod 600 .env</code></pre>
+        Inside <code>.env</code>:
+        <pre><code>ANTHROPIC_API_KEY=sk-ant-xxxx</code></pre>
+        Add <code>.env</code> to <code>.gitignore</code>.
+      </li>
+      <li><strong>Start Claude Code</strong> in the folder and paste the prompt below.</li>
+      <li><strong>Edit <code>rules.yaml</code></strong> that Claude creates — this is the source of truth for "PDFs go here, screenshots go there." Override anything you disagree with by hand.</li>
+      <li><strong>Test it once</strong> by running <code>organize --dry-run</code> and dropping a few files in <code>~/Downloads</code>. Confirm nothing got moved that shouldn't.</li>
+      <li><strong>Install it as a background service</strong> using the launchd plist (macOS) or systemd user unit (Linux) Claude generates. Ask Claude to walk you through <code>launchctl load</code> / <code>systemctl --user enable</code>.</li>
+    </ol>
+
+    <h2>The prompt</h2>
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <span class="prompt-block-label">Paste into Claude Code</span>
+        <button class="copy-btn">Copy prompt</button>
+      </div>
+      <pre><code>Build a local "Smart Downloads Organizer" — a Python service that watches ~/Downloads and sorts files into a tidy structure.
+
+Goals:
+- Local-first, safe by default (dry-run mode mandatory before first real move)
+- Predictable rule-based sorting, with optional AI classification for ambiguous files
+- Logged moves, reversible via an "undo last run" command
+- Never deletes files; only moves them
+- Honors a user-editable rules.yaml
+
+Target structure (configurable):
+~/Documents/Inbox/
+  PDFs/
+  Images/Screenshots/
+  Images/Photos/
+  Code/
+  Installers/
+  Archives/
+  Media/
+  Receipts/
+  Misc/&lt;YYYY-MM&gt;/
+
+Behavior:
+- Watches ~/Downloads with watchdog (filesystem events)
+- Applies rules from rules.yaml first (extension, filename regex, mime type, source app via xattr if available)
+- If no rule matches, optionally calls the Claude API with ONLY the filename + size + mime type (never the contents) and asks for a single-category classification
+- Atomic moves; if destination exists, append " (1)", " (2)", etc.
+- Maintains ~/.local/state/downloads-organizer/history.jsonl recording every move with timestamp + original/new path
+- `organize undo` reverses the most recent run
+
+CLI:
+organize watch              # daemon mode
+organize once               # single pass over Downloads
+organize --dry-run          # show what would happen
+organize undo               # reverse last run
+organize rules show         # print resolved rules
+organize stats              # what moved where, last 30 days
+
+Project layout:
+downloads-organizer/
+  README.md
+  pyproject.toml
+  .env.example
+  .gitignore
+  rules.yaml                # default rules, user-editable
+  organizer/
+    __init__.py
+    cli.py
+    watcher.py
+    rules.py
+    classifier.py           # optional Claude call
+    mover.py
+    history.py
+  scripts/
+    com.user.downloads-organizer.plist   # launchd
+    downloads-organizer.service          # systemd --user
+  tests/
+
+Hard requirements:
+- Default config NEVER touches files older than 1 hour (gives user time to grab a fresh download)
+- Default config NEVER touches files currently held open (check with lsof or fuser)
+- Symlinks are not followed
+- Hidden files (leading dot) are ignored
+- If Anthropic key is missing, classifier falls back to "Misc/&lt;YYYY-MM&gt;/" silently
+- API calls send filename + size + mime only — never file bytes
+- All moves logged before they happen
+
+Code quality:
+- Typed Python, Pydantic for config
+- Minimal dependencies (watchdog, pyyaml, pydantic, python-magic, anthropic optional)
+- Unit tests covering rule matching, the "file in use" guard, undo, and dedup-rename
+- A README with installation, service setup for both macOS and Linux, and a recovery section
+
+Before writing code, ask me 5 clarifying questions about my folder preferences, whether I want the AI classifier on by default, and what file types I most care about.</code></pre>
+    </div>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>The very first run, <strong>always use <code>--dry-run</code></strong> and read the output carefully.</li>
+      <li>Keep <code>rules.yaml</code> in git. It's the most valuable file in this project.</li>
+      <li>If a move ever surprises you, <code>organize undo</code> reverses it. The history log is your friend.</li>
+    </ul>
+
+    <div class="callout" style="margin-top: 40px;">
+      <strong>Next up:</strong> <a href="03-knowledge-base.html">Project 03 — Personal Knowledge Base →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="../assets/copy.js"></script>
+</body>
+</html>

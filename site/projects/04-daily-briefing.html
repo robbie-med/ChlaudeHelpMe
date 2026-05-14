@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daily Briefing Generator — ChlaudeHelpMe</title>
+<meta name="description" content="One command for weather, today's calendar, unread email summary, and news headlines." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="../index.html#setup">Setup</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="project-hero">
+  <div class="prose">
+    <div class="num">Project 04</div>
+    <h1>Daily Briefing Generator</h1>
+    <p class="lede">One command, one screen of useful information: weather, today's calendar, unread email count with subject highlights, top headlines, and a "what was open in my editor yesterday" reminder. Runs locally each morning and prints to your terminal — or to a markdown file you read with coffee.</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <h2>What you'll need</h2>
+    <ul>
+      <li>macOS or Linux.</li>
+      <li>Python 3.11+.</li>
+      <li><strong>Weather:</strong> a free <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (keyless, recommended) or <a href="https://openweathermap.org/api" target="_blank" rel="noopener">OpenWeatherMap</a> key.</li>
+      <li><strong>Calendar:</strong> a CalDAV URL (iCloud, Google, Fastmail all support this) OR a local <code>.ics</code> file path.</li>
+      <li><strong>Email:</strong> an IMAP-enabled mailbox. An <em>app-specific password</em>, not your main password.</li>
+      <li>Optional: a news source preference (Hacker News by default, no key needed).</li>
+    </ul>
+
+    <h2>Setup walkthrough</h2>
+    <ol class="steps">
+      <li><strong>Make the project folder:</strong>
+        <pre><code>mkdir -p ~/projects/daily-briefing &amp;&amp; cd ~/projects/daily-briefing
+git init</code></pre>
+      </li>
+      <li><strong>Create the secrets file:</strong>
+        <pre><code>mkdir -p ~/.config/briefing
+touch ~/.config/briefing/.env &amp;&amp; chmod 600 ~/.config/briefing/.env</code></pre>
+        Inside it:
+        <pre><code>LOCATION=Brooklyn,NY
+CALDAV_URL=https://caldav.icloud.com/...
+CALDAV_USER=you@icloud.com
+CALDAV_PASS=app-specific-password
+IMAP_HOST=imap.fastmail.com
+IMAP_USER=you@example.com
+IMAP_PASS=app-specific-password
+ANTHROPIC_API_KEY=sk-ant-xxxx   # optional, used for the prose summary</code></pre>
+      </li>
+      <li><strong>Open Claude Code</strong> in the project folder and paste the prompt.</li>
+      <li><strong>First run</strong> with <code>briefing --dry-run</code> so nothing tries to send mail or notifications by accident.</li>
+      <li><strong>Schedule it</strong> to run at 7am: Claude generates a launchd plist (macOS) or a systemd timer (Linux). Output goes to <code>~/.local/state/briefing/today.md</code> and optionally to a macOS notification or your terminal at next login.</li>
+    </ol>
+
+    <h2>The prompt</h2>
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <span class="prompt-block-label">Paste into Claude Code</span>
+        <button class="copy-btn">Copy prompt</button>
+      </div>
+      <pre><code>Build a Daily Briefing CLI that produces a one-screen morning summary, fully local.
+
+Sections, in order:
+1. Date, day, weather (today + tomorrow forecast)
+2. Calendar: today's events, with travel-time hints if location is in event
+3. Email: unread count + 5 highest-priority subject lines (priority by sender VIP list + keyword rules)
+4. News: top 10 Hacker News stories with score &gt; 200 from last 24h (configurable feed)
+5. Yesterday at a glance: from a simple "wins.md" or "log.md" the user maintains, the most recent entry
+6. One-paragraph prose summary (uses Claude API if ANTHROPIC_API_KEY is set, otherwise concatenates section headers)
+
+Data sources:
+- Weather: Open-Meteo (no key) by default; OpenWeatherMap if OWM_KEY present
+- Calendar: CalDAV (icalendar + caldav libs) OR a local .ics path
+- Email: IMAP (imaplib + email stdlib); read-only, never marks as read
+- News: HN Firebase API (no key)
+
+CLI:
+briefing                    # print to stdout
+briefing --md PATH          # write markdown to file
+briefing --notify           # macOS osascript notification / linux notify-send with the summary
+briefing --dry-run          # skip network, use cached fixtures
+briefing config show        # print resolved config (secrets redacted)
+
+Hard requirements:
+- All secrets from ~/.config/briefing/.env, never from the project folder
+- Email module is read-only; uses IMAP IDLE only if --watch is passed
+- VIP list and keyword rules live in ~/.config/briefing/rules.yaml
+- Caches API responses for 10 minutes to make repeated runs cheap
+- Output is plain markdown that renders nicely in terminal (use rich) and in any markdown viewer
+- Failures in any single section degrade gracefully — that section says "(unavailable: &lt;reason&gt;)" and the rest still prints
+
+Project layout:
+daily-briefing/
+  README.md
+  pyproject.toml
+  .env.example
+  briefing/
+    cli.py
+    weather.py
+    calendar_.py
+    mail.py
+    news.py
+    summarize.py
+    cache.py
+    config.py
+  scripts/
+    com.user.briefing.plist
+    briefing.service
+    briefing.timer
+  tests/
+
+Code quality:
+- Typed Python, Pydantic config
+- Minimal deps: httpx, caldav, icalendar, imapclient, rich, pyyaml, pydantic, anthropic optional
+- Tests with recorded fixtures (no live network in tests)
+- Clear README with examples for both macOS scheduling and Linux
+
+Before writing code, ask me 5 clarifying questions about my calendar source, my email provider, my VIP list, and what time of day I want this to run.</code></pre>
+    </div>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Use <strong>app-specific passwords</strong>, not your real password. Every major provider has them — search "app password &lt;provider&gt;".</li>
+      <li>Run it manually for a week and tweak <code>rules.yaml</code> before turning on the scheduler. The rule tuning is where most of the value lives.</li>
+      <li>If you want it pinned somewhere visible all day, pipe the markdown into your favorite note-taking app's "today" file.</li>
+    </ul>
+
+    <div class="callout" style="margin-top: 40px;">
+      <strong>Next up:</strong> <a href="05-meal-planner.html">Project 05 — Meal Planner & Grocery List →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="../assets/copy.js"></script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Beginner's Guide — ChlaudeHelpMe</title>
+<meta name="description" content="Terminals, file paths, env files, API keys, git, and how to actually iterate on a Claude Code project — in plain English." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="index.html#setup">Setup</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+<section class="hero" style="padding-bottom: 24px;">
+  <div class="prose">
+    <div class="eyebrow">The "I've never done this before" guide</div>
+    <h1>Plain English for the&nbsp;curious.</h1>
+    <p class="lede">This guide assumes you've never seriously used a terminal, don't know what an env file is, and have never touched git. By the end, you'll know enough to confidently iterate on Claude Code projects on your own computer.</p>
+    <p class="muted small">Read in order. Each section builds on the last. Skim if you already know the topic.</p>
+  </div>
+</section>
+
+<section id="terminal">
+  <div class="prose">
+    <div class="section-divider"></div>
+    <div class="eyebrow">01</div>
+    <h2>The Terminal</h2>
+    <p>The Terminal is a window where you type commands and the computer runs them. It's not magic — it's the same computer, just without buttons.</p>
+    <ul>
+      <li><strong>macOS:</strong> open the <strong>Terminal</strong> app (<span class="kbd">⌘</span> + <span class="kbd">Space</span>, type "Terminal").</li>
+      <li><strong>Linux:</strong> open whatever terminal app your distro ships (GNOME Terminal, Konsole, etc.).</li>
+    </ul>
+    <p>You'll see something like:</p>
+    <pre><code>yourname@yourcomputer ~ %</code></pre>
+    <p>The <code>~</code> is your <strong>home folder</strong>. The <code>%</code> (or <code>$</code>) is the <strong>prompt</strong> — the computer is waiting for you to type a command.</p>
+
+    <h3>The six commands you need</h3>
+    <table>
+      <thead><tr><th>Command</th><th>What it does</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><code>pwd</code></td><td>"Print working directory" — where am I?</td><td><code>pwd</code></td></tr>
+        <tr><td><code>ls</code></td><td>List files in the current folder</td><td><code>ls</code></td></tr>
+        <tr><td><code>cd</code></td><td>Change directory (move into a folder)</td><td><code>cd Documents</code></td></tr>
+        <tr><td><code>cd ..</code></td><td>Go up one folder</td><td><code>cd ..</code></td></tr>
+        <tr><td><code>mkdir</code></td><td>Make a new folder</td><td><code>mkdir projects</code></td></tr>
+        <tr><td><code>clear</code></td><td>Clear the screen</td><td><code>clear</code></td></tr>
+      </tbody>
+    </table>
+    <p>That's it. Everything else you can ask Claude.</p>
+    <div class="callout"><strong>Tip:</strong> drag a folder from Finder/Files into the terminal window — it pastes the path. Useful when paths get long.</div>
+  </div>
+</section>
+
+<section id="paths">
+  <div class="prose">
+    <div class="eyebrow">02</div>
+    <h2>File paths</h2>
+    <p>A <strong>path</strong> is the address of a file or folder. Two flavors:</p>
+    <ul>
+      <li><strong>Absolute</strong> — starts at the root. <code>/Users/jane/projects/finance/app.py</code></li>
+      <li><strong>Relative</strong> — starts where you are. If you're in <code>/Users/jane/projects/</code>, then <code>finance/app.py</code> is the same file.</li>
+    </ul>
+    <p>Shortcuts:</p>
+    <ul>
+      <li><code>~</code> means your home folder. <code>~/Documents</code> = <code>/Users/jane/Documents</code>.</li>
+      <li><code>.</code> means "current folder."</li>
+      <li><code>..</code> means "parent folder."</li>
+    </ul>
+    <p>Files starting with <code>.</code> (like <code>.env</code>) are hidden by default — use <code>ls -a</code> to see them.</p>
+  </div>
+</section>
+
+<section id="projects-structure">
+  <div class="prose">
+    <div class="eyebrow">03</div>
+    <h2>What is a project, structurally?</h2>
+    <p>A <strong>project</strong> is just a folder with related files inside it. That's it. Convention:</p>
+    <pre><code>~/projects/
+  finance-helper/        ← one project
+    README.md
+    .env                 ← your secrets (never share)
+    .gitignore           ← tells git what to ignore
+    app.py
+    requirements.txt
+  meal-planner/          ← another project
+    ...</code></pre>
+    <p><strong>Rules of thumb:</strong></p>
+    <ul>
+      <li>One folder per project. Don't mix two tools in one folder.</li>
+      <li>Keep projects under <code>~/projects/</code> so you can find them.</li>
+      <li>Lowercase folder names with dashes: <code>meal-planner</code>, not <code>Meal Planner</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="env-vars">
+  <div class="prose">
+    <div class="eyebrow">04</div>
+    <h2>Environment variables</h2>
+    <p>An <strong>environment variable</strong> is a named value the operating system makes available to programs that run. Think of it like a sticky note the OS hands to every program.</p>
+    <p>Common ones:</p>
+    <ul>
+      <li><code>HOME</code> — your home folder path</li>
+      <li><code>PATH</code> — list of folders where the OS looks for commands</li>
+      <li><code>ANTHROPIC_API_KEY</code> — Claude's SDK and many tools look for keys here</li>
+    </ul>
+    <p>See them all with <code>env</code>. Set one for a single command:</p>
+    <pre><code>ANTHROPIC_API_KEY=sk-ant-xxxx claude</code></pre>
+    <p>…or for the whole shell session by adding it to <code>~/.zshrc</code> (Mac) or <code>~/.bashrc</code> (Linux). But the cleanest approach is a <strong>.env file</strong>.</p>
+  </div>
+</section>
+
+<section id="env-file">
+  <div class="prose">
+    <div class="eyebrow">05</div>
+    <h2>The .env file</h2>
+    <p>A <code>.env</code> file is a plain text file that stores secrets and config values for one specific project. It usually lives in the project's root folder. Example:</p>
+    <pre><code>ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxx
+SIMPLEFIN_ACCESS_URL=https://bridge.simplefin.org/...
+DATABASE_PATH=./finance.sqlite</code></pre>
+    <p><strong>Rules:</strong></p>
+    <ol>
+      <li><strong>One key per line</strong>, format is <code>NAME=value</code>. No spaces around <code>=</code>.</li>
+      <li><strong>Never put it in git.</strong> Add <code>.env</code> to a <code>.gitignore</code> file.</li>
+      <li><strong>Lock the permissions</strong> so other users on the computer can't read it:
+        <pre><code>chmod 600 .env</code></pre>
+      </li>
+      <li>Always ship a <strong><code>.env.example</code></strong> alongside it — same keys, fake values — so future-you knows what to fill in.</li>
+    </ol>
+    <p>Programs load <code>.env</code> files with a library (e.g. <code>python-dotenv</code> in Python). The library reads the file and makes the values available as environment variables to your code.</p>
+  </div>
+</section>
+
+<section id="api-keys">
+  <div class="prose">
+    <div class="eyebrow">06</div>
+    <h2>API keys</h2>
+    <p>An <strong>API key</strong> is a long random string that identifies you to a service (like Anthropic's API, or your bank-data provider). It's a password your code uses instead of you typing one each time.</p>
+
+    <h3>Where do you get one?</h3>
+    <ul>
+      <li><strong>Anthropic / Claude API:</strong> <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> → API Keys → Create Key.</li>
+      <li><strong>Other services:</strong> each has its own dashboard. The pattern is always: sign in → developer/API section → create key.</li>
+    </ul>
+
+    <h3>How do you keep it safe?</h3>
+    <ol>
+      <li><strong>Never paste it in chat, screenshots, or commit messages.</strong></li>
+      <li><strong>Never put it in a file that gets uploaded to GitHub.</strong> Use <code>.env</code> (and gitignore <code>.env</code>).</li>
+      <li><strong>If you leak one, rotate it immediately</strong> — delete the key in the dashboard and create a new one. Assume the old one is compromised.</li>
+      <li><strong>Set spending limits</strong> in the provider's dashboard if they offer them. Caps the damage if a key leaks.</li>
+    </ol>
+
+    <h3>How does it get used?</h3>
+    <p>Your code reads it from the environment (e.g. <code>os.environ["ANTHROPIC_API_KEY"]</code>), and sends it as an HTTP header when calling the service. You shouldn't have to think about this — libraries handle it.</p>
+  </div>
+</section>
+
+<section id="git">
+  <div class="prose">
+    <div class="eyebrow">07</div>
+    <h2>Git in 60 seconds</h2>
+    <p><strong>Git</strong> is the "undo button for your project." Every Claude Code project should use it from day one.</p>
+
+    <h3>Setup once</h3>
+    <pre><code>git config --global user.name "Your Name"
+git config --global user.email "you@example.com"</code></pre>
+
+    <h3>Per project</h3>
+    <pre><code>git init                  # turn this folder into a git repo
+echo ".env" &gt; .gitignore  # never track secrets
+git add .                 # stage all current files
+git commit -m "initial"   # snapshot them</code></pre>
+
+    <h3>Daily</h3>
+    <pre><code>git add .
+git commit -m "added grocery list export"</code></pre>
+
+    <p>To throw away uncommitted changes:</p>
+    <pre><code>git restore .             # everything back to last commit</code></pre>
+
+    <p>To see what changed:</p>
+    <pre><code>git diff                  # unstaged changes
+git log --oneline         # commit history</code></pre>
+
+    <p>That's 95% of git for personal projects. You don't need GitHub unless you want to back up to the cloud or share.</p>
+  </div>
+</section>
+
+<section id="iterate">
+  <div class="prose">
+    <div class="eyebrow">08</div>
+    <h2>How to actually iterate</h2>
+    <p>This is the part most beginners get wrong: they ask Claude to "build the whole app" in one prompt, get a wall of code, can't debug it, and give up.</p>
+    <h3>Better workflow</h3>
+    <ol class="steps">
+      <li><strong>Write a short README first</strong> describing what you want. (Or use one of the <a href="index.html#projects">project prompts</a>.)</li>
+      <li><strong>Open Claude Code in the project folder.</strong> <code>cd ~/projects/my-thing &amp;&amp; claude</code></li>
+      <li><strong>First message:</strong> <em>"Read the README. Ask me 5 clarifying questions before writing any code."</em> Claude will surface assumptions you didn't realize you had.</li>
+      <li><strong>Build in vertical slices.</strong> One feature, end-to-end, before moving on. Don't build the whole database schema, then the whole UI — build one feature all the way through, then the next.</li>
+      <li><strong>Commit after every working slice.</strong> <code>git add . &amp;&amp; git commit -m "what changed"</code>. This is your undo button.</li>
+      <li><strong>When something breaks, paste the full error</strong> into Claude and ask "what does this mean?" Don't paraphrase — copy verbatim.</li>
+      <li><strong>When you're confused, ask Claude to explain.</strong> "Explain this file like I've never coded before."</li>
+      <li><strong>When the conversation gets long, use <code>/clear</code></strong> and start fresh in the same folder. Claude can re-read the files.</li>
+    </ol>
+
+    <h3>Anti-patterns to avoid</h3>
+    <ul>
+      <li><strong>"Just fix it" loops.</strong> If Claude's fix didn't work twice, stop. Step back, read the code together, ask "what's actually happening here?"</li>
+      <li><strong>Editing files manually without telling Claude.</strong> It'll keep operating on a stale mental model. Either let Claude make all edits, or tell it "I edited X by hand, please re-read."</li>
+      <li><strong>No commits.</strong> If you never commit, you can't undo. Commit early and often, even with bad messages.</li>
+      <li><strong>Pasting secrets into the chat.</strong> Put them in <code>.env</code>. Tell Claude "read the API key from <code>.env</code>," not "here's my API key: …"</li>
+    </ul>
+  </div>
+</section>
+
+<section id="layout">
+  <div class="prose">
+    <div class="eyebrow">09</div>
+    <h2>A starter folder layout</h2>
+    <p>For your overall machine:</p>
+    <pre><code>~/projects/                  ← all your Claude Code projects
+  finance-helper/
+  meal-planner/
+  knowledge-base/
+~/.config/                   ← per-app config (some projects put secrets here)
+  finance-sync/
+    .env</code></pre>
+    <p>And inside a typical project:</p>
+    <pre><code>my-project/
+  README.md                  ← what this project is
+  .env                       ← secrets, gitignored
+  .env.example               ← template, safe to commit
+  .gitignore                 ← list of things git should ignore
+  src/                       ← the code
+  tests/                     ← the tests
+  data/                      ← local data (often gitignored)</code></pre>
+    <p>Claude will set this up for you if you ask. The point is: there's a place for everything, and "where does this go?" is never a guess.</p>
+  </div>
+</section>
+
+<section id="stuck">
+  <div class="prose">
+    <div class="eyebrow">10</div>
+    <h2>When you get stuck</h2>
+    <ol>
+      <li><strong>Read the error message.</strong> Out loud if you have to. The answer is usually in it.</li>
+      <li><strong>Paste the error into Claude.</strong> Verbatim. Ask "what does this mean?"</li>
+      <li><strong>Check your <code>.env</code></strong> — typos in env vars are responsible for an alarming share of "it doesn't work."</li>
+      <li><strong>Look at recent commits</strong> — <code>git log --oneline</code>. What did you change since it last worked?</li>
+      <li><strong><code>git restore .</code></strong> to nuke uncommitted changes if you're hopelessly tangled.</li>
+      <li><strong><code>/clear</code> in Claude Code</strong> and start the conversation fresh.</li>
+      <li><strong>Walk away for 10 minutes.</strong> Genuinely. Half the time the answer arrives in the shower.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="glossary">
+  <div class="prose">
+    <div class="eyebrow">11</div>
+    <h2>Glossary</h2>
+    <table>
+      <thead><tr><th>Term</th><th>Plain English</th></tr></thead>
+      <tbody>
+        <tr><td><strong>CLI</strong></td><td>Command-line interface. A program you talk to by typing.</td></tr>
+        <tr><td><strong>Shell</strong></td><td>The program that reads your terminal input (<code>bash</code>, <code>zsh</code>, etc.).</td></tr>
+        <tr><td><strong>PATH</strong></td><td>List of folders where the shell looks for commands.</td></tr>
+        <tr><td><strong>Dependency</strong></td><td>A library your code uses. Listed in <code>requirements.txt</code> (Python) or <code>package.json</code> (Node).</td></tr>
+        <tr><td><strong>Virtual environment</strong></td><td>A sandboxed Python install for one project, so projects don't conflict. Made with <code>python -m venv .venv</code>.</td></tr>
+        <tr><td><strong>Repo / repository</strong></td><td>A folder tracked by git.</td></tr>
+        <tr><td><strong>Commit</strong></td><td>A snapshot of the project at a point in time.</td></tr>
+        <tr><td><strong>Branch</strong></td><td>A parallel line of development. You probably won't need branches for personal projects.</td></tr>
+        <tr><td><strong>MCP</strong></td><td>Model Context Protocol — a way to give Claude Code new tools (like access to a database or calendar). Optional, advanced.</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 48px; font-family: var(--font-serif); font-size: 22px; font-style: italic; color: var(--ink-2);">You now know more than 80% of people who claim to "use the terminal." Go <a href="index.html#projects">pick a project</a> and build something.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="assets/copy.js"></script>
+</body>
+</html>
