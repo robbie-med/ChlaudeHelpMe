@@ -1,0 +1,169 @@
+Build a local-first personal finance ingestion and analysis system for macOS.
+
+Core goals:
+- Fully local operation
+- Read-only bank access
+- Scheduled automated transaction sync
+- SQLite database backend
+- Claude-compatible analysis layer
+- Secure secret handling
+- Robust logging and deduplication
+- Production-quality code and documentation
+
+Architecture:
+Bank -> SimpleFIN or Plaid -> local Python sync service -> SQLite DB -> local analysis/API layer -> Claude Desktop or Claude API tools
+
+Technical requirements:
+
+Environment:
+- macOS
+- Python 3.12+
+- Use uv or venv
+- SQLite database
+- launchd preferred over cron
+- Use dotenv/env file for secrets
+- File permissions hardened appropriately
+
+Security requirements:
+- Secrets stored only in local .env file
+- Never print secrets to logs
+- Read-only financial access only
+- No credential storage beyond API tokens
+- Validate TLS
+- Use parameterized SQL queries
+- Ensure idempotent transaction ingestion
+- Support encrypted local backups if feasible
+- Claude must never directly access bank credentials
+
+Data sources:
+Implement support for:
+1. SimpleFIN Bridge
+2. Plaid
+
+Prefer SimpleFIN as default because:
+- simpler
+- read-only
+- personal-use oriented
+- lower operational complexity
+
+Database schema:
+Create normalized SQLite schema including:
+- institutions
+- accounts
+- transactions
+- categories
+- sync_state
+- ingestion_logs
+
+Transaction table should include:
+- transaction_id
+- posted_date
+- pending flag
+- merchant/raw description
+- normalized merchant
+- amount
+- currency
+- category
+- account_id
+- source system
+- imported_at
+- hash/dedup fields
+
+Requirements:
+- Deduplicate transactions safely
+- Handle pending -> posted transitions
+- Preserve raw transaction text
+- Preserve source metadata
+- Robust error handling
+- Retry logic with backoff
+- Structured logs
+- Dry-run mode
+- Unit tests
+
+Scheduling:
+Use launchd instead of cron.
+
+Create:
+- plist file
+- installation instructions
+- logging paths
+- example schedule running every 6 hours
+
+Secrets:
+Store secrets in:
+~/.config/finance-sync/.env
+
+Example:
+SIMPLEFIN_ACCESS_URL=...
+PLAID_CLIENT_ID=...
+PLAID_SECRET=...
+PLAID_ACCESS_TOKEN=...
+
+Set proper permissions:
+chmod 600 .env
+
+Project structure:
+finance-sync/
+  README.md
+  pyproject.toml
+  .env.example
+  finance_sync/
+    sync.py
+    plaid_client.py
+    simplefin_client.py
+    db.py
+    models.py
+    categorizer.py
+    logging_config.py
+  launchd/
+    com.user.financesync.plist
+  tests/
+
+Additional features:
+- Merchant normalization
+- Optional AI categorization layer
+- CSV export
+- Monthly summary generation
+- Budget tagging
+- Duplicate detection heuristics
+- Simple CLI interface
+
+CLI examples:
+finance-sync sync
+finance-sync dry-run
+finance-sync export-csv
+finance-sync monthly-summary
+
+Claude integration:
+Build a lightweight local API layer or MCP-compatible interface allowing Claude Desktop to:
+- query summaries
+- inspect categorized transactions
+- answer budgeting questions
+- generate reports
+
+Claude should only receive:
+- sanitized transaction data
+- aggregated summaries
+- never credentials or raw auth tokens
+
+Deliverables:
+- Complete runnable codebase
+- README with setup instructions
+- launchd installation instructions
+- SQLite schema migration setup
+- Example .env
+- Example queries
+- Unit tests
+- Security notes
+- Troubleshooting section
+
+Code quality expectations:
+- Typed Python
+- Pydantic models
+- Clear comments
+- Production-grade structure
+- Minimal dependencies
+- Defensive programming
+- Clean architecture
+
+Do not mock the implementation. Produce real runnable code.
