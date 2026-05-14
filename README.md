@@ -1,13 +1,13 @@
 # ChlaudeHelpMe — A Starter Kit for Claude Code on Mac & Linux
 
-> 🌐 **Looking for the prettier version?** This same content is rendered as a polished static website in `site/`. Open `site/index.html` in a browser, or host it via GitHub Pages and share the link. The README below is the GitHub-friendly mirror.
+> 🌐 **Looking for the prettier version?** This same content is rendered as a polished static website at the repo root (`index.html`, `beginners.html`, `projects/*.html`). Once GitHub Pages is enabled, share `https://YOUR-USERNAME.github.io/ChlaudeHelpMe/`. The README below is the GitHub-friendly mirror.
 
 This repo is a friendly on-ramp for using **Claude Code** — Anthropic's command-line coding assistant — on your own computer. It contains:
 
 1. A step-by-step **setup guide** (this README) for macOS and Linux.
 2. Seven **copy-paste project prompts** that turn Claude Code into a genuinely useful personal tool.
 3. A separate **[BEGINNERS.md](./BEGINNERS.md)** that explains terminals, folders, env files, API keys, and "how do I actually iterate on a project?" in plain English.
-4. A **[static website](./site/index.html)** version of everything above — designed for sharing as a link.
+4. A **static website** version of everything above — `index.html` at the repo root, designed for sharing as a link via GitHub Pages.
 
 If you've never used a terminal before, **start with [BEGINNERS.md](./BEGINNERS.md)** and come back here.
 
@@ -155,23 +155,22 @@ Each link below opens a markdown file with **(a)** a setup walkthrough and **(b)
 
 ## Part 7 — Sharing the website
 
-The `site/` folder contains a fully static website (HTML/CSS/JS only — no build step) that presents this same content in a friendlier visual form. To share it as a link:
+The repo root contains a fully static website (HTML/CSS/JS only — no build step). To share it as a link:
 
 **Option A — GitHub Pages (free, recommended):**
 
 1. Push this repo to GitHub.
-2. In the repo settings → Pages, set the source to your branch and the folder to `/site`.
-3. GitHub gives you a URL like `https://YOUR-USERNAME.github.io/ChlaudeHelpMe/` — share that.
+2. In the repo settings → Pages, set the source to "Deploy from a branch", pick your branch, and leave the folder as `/ (root)`.
+3. GitHub gives you a URL like `https://YOUR-USERNAME.github.io/ChlaudeHelpMe/` — share that. (The `.nojekyll` file at the root keeps GitHub from mangling the site.)
 
 **Option B — Local preview:**
 
 ```bash
-cd site
 python3 -m http.server 8000
 # open http://localhost:8000 in your browser
 ```
 
-**Option C — Anywhere else:** the `site/` folder works on Netlify, Vercel, Cloudflare Pages, or any static host. Just point it at the folder; no build command needed.
+**Option C — Anywhere else:** the repo works on Netlify, Vercel, Cloudflare Pages, or any static host. Just point it at the repo root; no build command needed.
 
 ---
 
