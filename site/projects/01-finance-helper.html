@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Personal Finance Helper — ChlaudeHelpMe</title>
+<meta name="description" content="A local-first personal finance system. Bank transactions in SQLite. Claude answers where your money went." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="../index.html#setup">Setup</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="project-hero">
+  <div class="prose">
+    <div class="num">Project 01</div>
+    <h1>Personal Finance Helper</h1>
+    <p class="lede">A fully local personal-finance system. Pulls transactions from your bank (via SimpleFIN or Plaid), stores them in SQLite, categorizes them, and lets Claude answer questions like <em>"where did my money actually go in March?"</em> — without sending data to a third party beyond your chosen data provider.</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <h2>What you'll need</h2>
+    <ul>
+      <li>macOS or Linux. (The prompt targets macOS + <code>launchd</code>; on Linux ask Claude to substitute <code>systemd --user</code> units or cron — it will.)</li>
+      <li>Python 3.12+. Install via <a href="https://python.org" target="_blank" rel="noopener">python.org</a> or <code>brew install python@3.12</code> on Mac.</li>
+      <li>A <strong>SimpleFIN Bridge</strong> subscription (~$1.50/month, recommended) or a Plaid developer account (free tier exists, more setup).</li>
+      <li>About 30 minutes for the first run.</li>
+    </ul>
+
+    <h2>Setup walkthrough</h2>
+    <ol class="steps">
+      <li><strong>Make the project folder</strong> and step into it:
+        <pre><code>mkdir -p ~/projects/finance-helper &amp;&amp; cd ~/projects/finance-helper
+git init</code></pre>
+      </li>
+      <li><strong>Sign up for SimpleFIN Bridge</strong> at <a href="https://bridge.simplefin.org" target="_blank" rel="noopener">bridge.simplefin.org</a>. After linking your bank you'll get an <strong>Access URL</strong> that looks like <code>https://username:password@bridge.simplefin.org/simplefin</code>. Keep it.
+      </li>
+      <li><strong>Make a secrets folder</strong> (the prompt expects this path):
+        <pre><code>mkdir -p ~/.config/finance-sync
+touch ~/.config/finance-sync/.env
+chmod 600 ~/.config/finance-sync/.env</code></pre>
+        Open that <code>.env</code> in a text editor and add:
+        <pre><code>SIMPLEFIN_ACCESS_URL=paste-your-url-here</code></pre>
+      </li>
+      <li><strong>Start Claude Code</strong> in the project folder:
+        <pre><code>claude</code></pre>
+      </li>
+      <li><strong>Paste the prompt below</strong> as your first message. Claude will ask clarifying questions, then build the code, the schema, the launchd plist, and tests.</li>
+      <li><strong>First sync:</strong> once Claude says it's ready, run <code>finance-sync dry-run</code> to verify the pipeline, then <code>finance-sync sync</code> for real.</li>
+      <li><strong>Ask questions:</strong> with the database populated, open Claude Code again in the folder and ask things like <em>"summarize spending by category last month"</em> or <em>"find subscriptions I forgot about."</em> Claude can query the SQLite db directly.</li>
+    </ol>
+
+    <h2>The prompt</h2>
+    <p>Copy this and paste it into Claude Code as your first message.</p>
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <span class="prompt-block-label">Paste into Claude Code</span>
+        <button class="copy-btn">Copy prompt</button>
+      </div>
+      <pre><code>Build a local-first personal finance ingestion and analysis system for macOS.
+
+Core goals:
+- Fully local operation
+- Read-only bank access
+- Scheduled automated transaction sync
+- SQLite database backend
+- Claude-compatible analysis layer
+- Secure secret handling
+- Robust logging and deduplication
+- Production-quality code and documentation
+
+Architecture:
+Bank -&gt; SimpleFIN or Plaid -&gt; local Python sync service -&gt; SQLite DB -&gt; local analysis/API layer -&gt; Claude Desktop or Claude API tools
+
+Technical requirements:
+
+Environment:
+- macOS (on Linux, substitute systemd --user units for launchd)
+- Python 3.12+
+- Use uv or venv
+- SQLite database
+- launchd preferred over cron
+- Use dotenv/env file for secrets
+- File permissions hardened appropriately
+
+Security requirements:
+- Secrets stored only in local .env file
+- Never print secrets to logs
+- Read-only financial access only
+- No credential storage beyond API tokens
+- Validate TLS
+- Use parameterized SQL queries
+- Ensure idempotent transaction ingestion
+- Support encrypted local backups if feasible
+- Claude must never directly access bank credentials
+
+Data sources:
+1. SimpleFIN Bridge (default, preferred)
+2. Plaid (optional)
+
+Database schema (SQLite):
+- institutions, accounts, transactions, categories, sync_state, ingestion_logs
+- transactions table includes: transaction_id, posted_date, pending flag, merchant/raw description, normalized merchant, amount, currency, category, account_id, source system, imported_at, hash/dedup fields
+
+Behavior:
+- Deduplicate transactions safely
+- Handle pending -&gt; posted transitions
+- Preserve raw transaction text and source metadata
+- Robust error handling with retry/backoff
+- Structured logs
+- Dry-run mode
+- Unit tests
+
+Scheduling:
+- launchd plist running every 6 hours
+- Installation instructions, logging paths
+
+Secrets:
+- Store in ~/.config/finance-sync/.env
+- chmod 600
+- Example keys: SIMPLEFIN_ACCESS_URL, PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ACCESS_TOKEN
+
+Project structure:
+finance-sync/
+  README.md
+  pyproject.toml
+  .env.example
+  finance_sync/
+    sync.py
+    plaid_client.py
+    simplefin_client.py
+    db.py
+    models.py
+    categorizer.py
+    logging_config.py
+  launchd/
+    com.user.financesync.plist
+  tests/
+
+CLI:
+finance-sync sync
+finance-sync dry-run
+finance-sync export-csv
+finance-sync monthly-summary
+
+Claude integration:
+Build a lightweight local API layer (or MCP-compatible interface) allowing Claude to:
+- query summaries
+- inspect categorized transactions
+- answer budgeting questions
+- generate reports
+Claude must only receive sanitized transaction data, never credentials.
+
+Code quality:
+- Typed Python with Pydantic models
+- Minimal dependencies
+- Clean architecture
+- Defensive programming
+
+Deliverables:
+- Complete runnable codebase
+- README with setup instructions
+- launchd installation instructions
+- SQLite schema migration setup
+- Example .env
+- Example queries
+- Unit tests
+- Security notes
+- Troubleshooting section
+
+Before writing any code, ask me 5 clarifying questions about my bank, my categorization preferences, and how I plan to schedule syncs.</code></pre>
+    </div>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Run <code>finance-sync dry-run</code> after every code change before letting it write to your real database.</li>
+      <li>Commit after each working slice: <code>git add . &amp;&amp; git commit -m "schema + simplefin client"</code>.</li>
+      <li>If categorization is wrong, ask Claude to add a <code>rules.yaml</code> file you can edit by hand — it's easier than retraining anything.</li>
+    </ul>
+
+    <div class="callout" style="margin-top: 40px;">
+      <strong>Next up:</strong> <a href="02-downloads-organizer.html">Project 02 — Smart Downloads Organizer →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="../assets/copy.js"></script>
+</body>
+</html>

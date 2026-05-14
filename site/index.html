@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ChlaudeHelpMe — A friendly on-ramp to Claude Code</title>
+<meta name="description" content="Install Claude Code on Mac or Linux in five minutes. Seven copy-paste projects that turn your terminal into a personal assistant. No programming experience required." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="#setup">Setup</a>
+      <a href="#projects">Projects</a>
+      <a href="beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="prose">
+    <div class="eyebrow">A starter kit for Claude Code</div>
+    <h1>A friendly on-ramp to <span class="accent">Claude Code.</span></h1>
+    <p class="lede">Install in five minutes. Build something real in an hour. Seven copy-paste projects that turn your terminal into a personal assistant — no programming experience required.</p>
+    <div class="cta-row">
+      <a href="#setup" class="btn primary">Get started <span class="arrow">→</span></a>
+      <a href="beginners.html" class="btn secondary">First time? Read this</a>
+    </div>
+  </div>
+</section>
+
+<section id="what">
+  <div class="prose">
+    <div class="section-divider"></div>
+    <h2>What is Claude Code?</h2>
+    <p>Claude Code is a command-line tool. You open a terminal, <code>cd</code> into a folder, run <code>claude</code>, and then talk to Claude in plain English. Claude can read your files, run commands, write code, run tests, and iterate with you. It is interactive — like pair programming with someone who never gets tired.</p>
+    <p>You do <strong>not</strong> need to be a programmer to use it. You do need to be willing to read what it tells you and answer its questions.</p>
+    <div class="callout">
+      <strong>Never used a terminal?</strong> Read <a href="beginners.html">BEGINNERS.md</a> first — it covers terminals, file paths, env files, API keys, and how to iterate on a project. Plain English, no jargon.
+    </div>
+  </div>
+</section>
+
+<section id="setup">
+  <div class="prose">
+    <div class="section-divider"></div>
+    <div class="eyebrow">Part 1</div>
+    <h2>Install Claude Code</h2>
+    <p>Pick your operating system. Either path takes about three minutes.</p>
+
+    <div data-tabs>
+      <div class="tabs">
+        <button class="tab-btn active" data-target="mac">macOS</button>
+        <button class="tab-btn" data-target="linux">Linux</button>
+      </div>
+
+      <div class="tab-panel active" data-panel="mac">
+        <h3>Option A — Homebrew (recommended)</h3>
+        <ol>
+          <li>Open <strong>Terminal</strong> (<span class="kbd">⌘</span> + <span class="kbd">Space</span>, type "Terminal").</li>
+          <li>If you don't have Homebrew, install it from <a href="https://brew.sh" target="_blank" rel="noopener">brew.sh</a>.</li>
+          <li>Install Claude Code:
+            <pre><code>brew install --cask claude-code</code></pre>
+          </li>
+          <li>Verify:
+            <pre><code>claude --version</code></pre>
+          </li>
+        </ol>
+
+        <h3>Option B — Official installer</h3>
+        <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+        <p>Close and reopen Terminal so your shell picks up the new command, then run <code>claude --version</code>.</p>
+      </div>
+
+      <div class="tab-panel" data-panel="linux">
+        <p>The official installer works on Ubuntu, Debian, Fedora, Arch, and most other major distros.</p>
+        <ol>
+          <li>Open a terminal.</li>
+          <li>Paste:
+            <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+          </li>
+          <li>If the installer mentions a PATH change, reload your shell:
+            <pre><code>source ~/.bashrc      # or ~/.zshrc if you use zsh</code></pre>
+          </li>
+          <li>Verify:
+            <pre><code>claude --version</code></pre>
+          </li>
+        </ol>
+        <div class="callout">
+          <strong>If <code>claude</code> isn't found:</strong> the installer likely placed it in <code>~/.local/bin</code>. Make sure it's on your PATH:
+          <pre style="margin-top:12px"><code>echo 'export PATH="$HOME/.local/bin:$PATH"' &gt;&gt; ~/.bashrc
+source ~/.bashrc</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="signin">
+  <div class="prose">
+    <div class="eyebrow">Part 2</div>
+    <h2>Sign in</h2>
+    <p>The first time you run <code>claude</code>, it will prompt you to authenticate. Two choices:</p>
+    <ul>
+      <li><strong>Claude.ai account (subscription)</strong> — log in with your Anthropic account in the browser window that pops up. Easiest. If you have Claude Pro or Max, this is what you want.</li>
+      <li><strong>API key (pay-as-you-go)</strong> — get a key from <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>, then paste it when <code>claude</code> prompts. This bills usage to your Anthropic account.</li>
+    </ul>
+    <div class="callout">
+      <strong>What's an API key?</strong> A long random string that proves you're allowed to use the service. Treat it like a password. <a href="beginners.html#api-keys">Full explanation in the beginner's guide</a>.
+    </div>
+  </div>
+</section>
+
+<section id="first-run">
+  <div class="prose">
+    <div class="eyebrow">Part 3</div>
+    <h2>Your first session</h2>
+    <ol class="steps">
+      <li>
+        <strong>Make a project folder</strong> (anywhere is fine):
+        <pre><code>mkdir -p ~/projects/hello-claude
+cd ~/projects/hello-claude</code></pre>
+      </li>
+      <li>
+        <strong>Start Claude Code</strong>:
+        <pre><code>claude</code></pre>
+      </li>
+      <li>
+        <strong>Type your first prompt</strong>. Try:
+        <blockquote>Make a simple "Hello, world" Python script and run it.</blockquote>
+      </li>
+      <li>
+        <strong>Read each permission request before approving.</strong> While you're learning, default to "yes for this command only" rather than blanket approval.
+      </li>
+    </ol>
+    <p>That's it. You've used Claude Code.</p>
+  </div>
+</section>
+
+<section id="habits">
+  <div class="prose">
+    <div class="eyebrow">Part 4</div>
+    <h2>Day-to-day habits</h2>
+    <p>A few habits that pay off over time:</p>
+    <ul>
+      <li><strong>One folder per project.</strong> Don't run <code>claude</code> in your home directory. Make a folder for each tool/idea and <code>cd</code> into it.</li>
+      <li><strong>Use git from day one.</strong> Even for tiny projects: <code>git init</code> so you can undo Claude's changes with <code>git diff</code> and <code>git restore</code>.</li>
+      <li><strong>Iterate in small steps.</strong> "Build me a finance app" is a worse prompt than "Set up the database schema first; we'll add the import script after."</li>
+      <li><strong>Read the diffs.</strong> When Claude proposes changes, skim them. You'll learn fast and catch mistakes early.</li>
+      <li><strong>Slash commands.</strong> Inside Claude Code, type <code>/help</code> for built-in commands like <code>/clear</code>, <code>/model</code>, <code>/cost</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container">
+    <div class="section-divider"></div>
+    <div class="eyebrow">Part 5</div>
+    <h2>Seven projects to try</h2>
+    <p class="lede" style="font-size: 19px; max-width: 720px;">Each one has a setup walkthrough and a long, careful copy-paste prompt. Built to produce real, useful tools — not toys.</p>
+
+    <div class="project-grid">
+      <a class="card" href="projects/01-finance-helper.html">
+        <div class="num">Project 01</div>
+        <h3>Personal Finance Helper</h3>
+        <p>Pulls your bank transactions locally, categorizes them, lets Claude answer "where did my money actually go this month?" — without sending data anywhere you didn't choose.</p>
+        <div class="open">Open project <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" href="projects/02-downloads-organizer.html">
+        <div class="num">Project 02</div>
+        <h3>Smart Downloads Organizer</h3>
+        <p>A background service that sorts your Downloads folder by type and date, with optional AI classification for ambiguous files. Safe, reversible, rule-driven.</p>
+        <div class="open">Open project <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" href="projects/03-knowledge-base.html">
+        <div class="num">Project 03</div>
+        <h3>Personal Knowledge Base</h3>
+        <p>Index your markdown notes — Obsidian, Bear, Apple Notes exports — and ask Claude questions across all of them. Citations to the exact note and line.</p>
+        <div class="open">Open project <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" href="projects/04-daily-briefing.html">
+        <div class="num">Project 04</div>
+        <h3>Daily Briefing Generator</h3>
+        <p>One command, one screen: weather, today's calendar, unread email summary, news headlines. Scheduled for 7am, printed with your coffee.</p>
+        <div class="open">Open project <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" href="projects/05-meal-planner.html">
+        <div class="num">Project 05</div>
+        <h3>Meal Planner & Grocery List</h3>
+        <p>Knows what's already in your pantry. Plans a week of meals that minimize waste, exports a deduplicated grocery list to Reminders or Todoist.</p>
+        <div class="open">Open project <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" href="projects/06-photo-dedupe.html">
+        <div class="num">Project 06</div>
+        <h3>Photo Library Deduplicator</h3>
+        <p>Find duplicates and near-duplicates safely. Review side-by-side previews. Moves dupes to a holding folder — never deletes. Fully reversible.</p>
+        <div class="open">Open project <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" href="projects/07-habit-tracker.html">
+        <div class="num">Project 07</div>
+        <h3>Habit & Mood Tracker</h3>
+        <p>A small, beautiful terminal app. SQLite-backed. Daily check-in in ten seconds. Weekly review with charts and an optional Claude-written reflection.</p>
+        <div class="open">Open project <span class="arrow">→</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="troubleshooting">
+  <div class="prose">
+    <div class="section-divider"></div>
+    <div class="eyebrow">Part 6</div>
+    <h2>When something goes wrong</h2>
+    <table>
+      <thead><tr><th>Symptom</th><th>What to try</th></tr></thead>
+      <tbody>
+        <tr><td><code>claude: command not found</code></td><td>The install directory isn't on your PATH. See the Linux troubleshooting note above.</td></tr>
+        <tr><td>Conversation feels stale</td><td>Type <code>/clear</code> to start a clean conversation in the same folder.</td></tr>
+        <tr><td>Don't like a change</td><td><code>git diff</code> shows what changed; <code>git restore &lt;file&gt;</code> undoes it.</td></tr>
+        <tr><td>Costs feel high</td><td><code>/cost</code> mid-session for usage. Use <code>/model</code> to switch to a cheaper model.</td></tr>
+        <tr><td>You're lost</td><td>Paste the error into Claude and ask "what does this mean and how do I fix it?" Genuinely effective.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="next">
+  <div class="prose">
+    <div class="section-divider"></div>
+    <h2>Where to go next</h2>
+    <ul>
+      <li><a href="beginners.html"><strong>Beginner's guide</strong></a> — terminals, paths, env files, API keys, and a workflow that works for non-coders.</li>
+      <li><a href="https://docs.claude.com/en/docs/claude-code" target="_blank" rel="noopener"><strong>Official docs</strong></a> — settings, hooks, MCP servers, sub-agents.</li>
+      <li><a href="#projects"><strong>Pick a project above</strong></a> and just start. You learn this stuff by doing it, not by reading about it.</li>
+    </ul>
+    <p style="margin-top: 40px; font-family: var(--font-serif); font-size: 22px; font-style: italic; color: var(--ink-2);">Happy building.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="assets/copy.js"></script>
+</body>
+</html>

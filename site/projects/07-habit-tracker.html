@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Habit & Mood Tracker — ChlaudeHelpMe</title>
+<meta name="description" content="A small, beautiful terminal app for daily habits and mood. SQLite-backed. Weekly review with charts." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="../index.html#setup">Setup</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="project-hero">
+  <div class="prose">
+    <div class="num">Project 07</div>
+    <h1>Habit & Mood Tracker</h1>
+    <p class="lede">A small, beautiful terminal app for daily habits and mood. Log a check-in in ten seconds. SQLite under the hood, so your data is yours. Weekly review prints streaks, charts, and a one-paragraph reflection (optionally written by Claude from your week's data — pattern-spotting, not therapy).</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <h2>What you'll need</h2>
+    <ul>
+      <li>macOS or Linux.</li>
+      <li>Python 3.11+.</li>
+      <li>A terminal that supports 256 colors (basically all modern ones).</li>
+      <li>Optional: Anthropic API key, only for the AI-written weekly reflection.</li>
+    </ul>
+
+    <h2>Setup walkthrough</h2>
+    <ol class="steps">
+      <li><strong>Make the project folder:</strong>
+        <pre><code>mkdir -p ~/projects/habit-tracker &amp;&amp; cd ~/projects/habit-tracker
+git init</code></pre>
+      </li>
+      <li><strong>Create the data folder</strong> (this is where your tracker lives, separate from code):
+        <pre><code>mkdir -p ~/.local/share/habit</code></pre>
+      </li>
+      <li><strong>(Optional) <code>.env</code> for AI reflections:</strong>
+        <pre><code>ANTHROPIC_API_KEY=sk-ant-xxxx</code></pre>
+      </li>
+      <li><strong>Open Claude Code</strong>, paste the prompt below.</li>
+      <li><strong>Initial setup:</strong>
+        <pre><code>habit init           # interactive: define your habits
+habit checkin        # interactive daily log</code></pre>
+      </li>
+      <li><strong>Add it to your shell startup</strong> so it nudges you once a day (Claude provides a snippet for <code>~/.zshrc</code> or <code>~/.bashrc</code>).</li>
+      <li><strong>Review weekly:</strong>
+        <pre><code>habit week
+habit chart sleep --last 30</code></pre>
+      </li>
+    </ol>
+
+    <h2>The prompt</h2>
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <span class="prompt-block-label">Paste into Claude Code</span>
+        <button class="copy-btn">Copy prompt</button>
+      </div>
+      <pre><code>Build a Habit & Mood Tracker CLI — small, fast, beautiful in the terminal.
+
+Goals:
+- Daily check-in takes &lt; 15 seconds
+- Stores everything in SQLite at ~/.local/share/habit/habit.sqlite
+- Tracks habits (boolean / numeric / scale 1-5) AND mood + free-text journal
+- Streaks, weekly summary, ASCII charts
+- Optional AI reflection at end of week (Claude API; only sends aggregated, anonymized data)
+- Works offline; AI is purely additive
+
+Habit types:
+- boolean: "Did I X today?" (meditate, lift weights)
+- numeric: "How many?" (glasses of water, pages read)
+- scale: 1-5 (sleep quality, energy)
+
+CLI (built with Click + Rich for simplicity):
+habit init                        # interactive setup: define habits
+habit checkin [--date YYYY-MM-DD] # interactive logging
+habit show today
+habit show week
+habit streak [habit]
+habit chart &lt;habit&gt; [--last N]    # sparkline / bar chart in terminal
+habit journal add "free text"
+habit journal show --last 7
+habit week                        # full weekly review: streaks, mood trend, journal recap
+habit week --ai                   # plus a 1-paragraph reflection from Claude
+habit export --format {csv,json,markdown}
+habit import &lt;file&gt;
+
+Database schema:
+- habits(id, name, type, unit, target, created_at, archived)
+- entries(id, habit_id, date, value, note)
+- moods(id, date, score, note)
+- journal(id, date, body)
+
+Hard requirements:
+- Single SQLite file, durable (WAL mode)
+- Migrations folder; first version is migration 001
+- Backup command: `habit backup` writes a timestamped copy to ~/.local/share/habit/backups/
+- AI reflection (when enabled) is sent ONLY aggregated counts and 1-5 scale averages plus the journal text the user wrote; no raw entries beyond that
+- AI prompt explicitly instructs Claude: "describe patterns; do not diagnose, do not advise medically"
+- Every destructive action confirms (delete habit, drop entries)
+- Output uses Rich for color but degrades gracefully when piped (TTY check)
+
+Project layout:
+habit-tracker/
+  README.md
+  pyproject.toml
+  .env.example
+  habit/
+    cli.py
+    db.py
+    migrations/
+      001_initial.sql
+    models.py
+    checkin.py
+    summary.py
+    charts.py
+    ai_reflection.py
+    backup.py
+  tests/
+
+Code quality:
+- Typed Python, Pydantic models
+- Minimal deps: click, rich, pydantic, anthropic optional
+- Tests cover streak math, week-boundary edge cases, migrations, and backup
+- README screenshot of a terminal session (use a code block, don't generate images)
+
+Before writing code, ask me 5 clarifying questions about which habits I want to track, my week-start day, whether I want a morning or evening check-in, and whether the AI reflection should be on by default.</code></pre>
+    </div>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>The biggest predictor of habit-tracker success is <em>speed of check-in</em>. Resist the urge to add ten fields.</li>
+      <li>The journal is where the value compounds. Even a one-sentence entry per day becomes priceless after six months.</li>
+      <li><code>habit backup</code> weekly. Cron it or just remember after <code>habit week</code>. Your SQLite file is your data — back it up.</li>
+    </ul>
+
+    <div class="callout" style="margin-top: 40px;">
+      <strong>That's all seven.</strong> <a href="../index.html#projects">← Back to all projects</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/ChlaudeHelpMe" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="../assets/copy.js"></script>
+</body>
+</html>
