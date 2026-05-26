@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project 3 — Morning Briefing — ChlaudeHelpMe</title>
+<meta name="description" content="One command for weather, headlines, and (optionally) email. Your first integration with the outside world. Schedule it to run in the background." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="../index.html#setup">Setup</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/chlaudehelpme" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="project-hero">
+  <div class="prose">
+    <div class="num">Project 03</div>
+    <h1>Morning Briefing</h1>
+    <p class="lede"><strong>An evening.</strong> Your first integration with the outside world. One command, one screen: today's weather, top headlines, and (optionally) the count of unread emails in your inbox. Runs whenever you want — manually, or on a schedule so the file is waiting when you sit down with coffee.</p>
+    <p>This is where you meet <code>.env</code> files, app-specific passwords, and <em>graceful degradation</em> — fancy words for <em>the script keeps working even if one section can't reach the internet.</em></p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <h2>What you'll need</h2>
+    <ul>
+      <li>The basics from Projects 1 and 2.</li>
+      <li>Optional: an email account that supports IMAP and <strong>app-specific passwords</strong> (Gmail, iCloud, Fastmail all do). If you skip email, the rest of the script still works.</li>
+      <li>No paid keys. Weather (Open-Meteo) and news (Hacker News) are both free and require no signup.</li>
+    </ul>
+
+    <h2>Setup walkthrough</h2>
+    <ol class="steps">
+      <li><strong>Make the project folder:</strong>
+        <pre><code>mkdir -p ~/projects/briefing &amp;&amp; cd ~/projects/briefing
+git init</code></pre>
+      </li>
+      <li><strong>Create an empty <code>.env</code></strong> (you'll fill it in when Claude asks):
+        <pre><code>touch .env
+chmod 600 .env
+echo ".env" &gt; .gitignore</code></pre>
+      </li>
+      <li><strong>Start Claude Code</strong> and paste the prompt below.</li>
+      <li><strong>First run:</strong>
+        <pre><code>briefing</code></pre>
+        Weather and HN headlines should print immediately. If you didn't set email config, that section says <code>(unavailable: not configured)</code> and the rest still prints. That's the design.
+      </li>
+      <li><strong>Schedule it to run in the background</strong> (ask Claude after the basics work). Pick one:
+        <ul>
+          <li>macOS: a <code>launchd</code> plist that runs at 7am, writing the markdown to <code>~/.local/state/briefing/today.md</code>.</li>
+          <li>Linux: a <code>systemd --user</code> timer doing the same.</li>
+          <li>Either OS: a one-line <code>crontab</code> entry.</li>
+        </ul>
+        Once it's running, open Claude Desktop and ask <em>"read <code>~/.local/state/briefing/today.md</code> and summarize"</em> — your briefing is now part of any conversation, without you running anything by hand.
+      </li>
+    </ol>
+
+    <h2>Adding email (optional)</h2>
+    <p>Most providers don't let scripts log in with your normal password. You need an <strong>app-specific password</strong>: a separate, revocable password meant for programs. Search <em>"&lt;your provider&gt; app password"</em> — there's a settings page in every major mail provider. Generate one, paste it into <code>.env</code> as <code>IMAP_PASS</code>, and you're done. If the script ever leaks somewhere it shouldn't, you revoke that one password — not your real one.</p>
+
+    <h2>The prompt</h2>
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <span class="prompt-block-label">Paste into Claude Code</span>
+        <button class="copy-btn">Copy prompt</button>
+      </div>
+      <pre><code>Build a `briefing` CLI that prints a one-screen morning summary. Single
+Python project, minimal dependencies.
+
+Sections, in order, each independent (failure in one doesn't break the rest):
+1. Date and weather. Use Open-Meteo (no key required). Read LAT and LON from
+   .env. If missing, prompt me in the README to add them.
+2. Top 10 Hacker News stories from the last 24 hours with score &gt; 100. Use
+   the public Firebase API at https://hacker-news.firebaseio.com/v0/. No key.
+3. Email (optional). If IMAP_HOST, IMAP_USER, IMAP_PASS are set in .env,
+   connect read-only and print the count of unread messages plus the latest
+   5 unread subject lines. Use stdlib imaplib. NEVER mark anything as read.
+   If any of the three IMAP vars is missing, print "(email: not configured)"
+   and move on.
+
+Output:
+- Markdown to stdout by default, formatted with `rich` so it looks nice in
+  the terminal but renders as plain markdown when piped.
+- `briefing --out PATH` writes the markdown to a file instead.
+- `briefing --json` prints the same data as JSON (handy if I want to script on it).
+
+CLI:
+  briefing              Print to stdout
+  briefing --out PATH   Write markdown to file
+  briefing --json       Emit JSON
+  briefing config show  Print resolved config with secrets redacted
+
+Hard requirements:
+- All secrets read from `.env` in the current folder, via `python-dotenv`.
+- Network calls have a 10-second timeout. If something times out, that
+  section says "(unavailable: timeout)" and the rest still runs.
+- Cache HN and weather responses for 10 minutes (in a temp file) so I can
+  run `briefing` repeatedly without hammering the APIs.
+- No "scheduling" code in the Python itself. Scheduling is the OS's job.
+
+Project layout:
+  briefing/
+    pyproject.toml
+    .env.example     (LAT, LON, IMAP_HOST, IMAP_USER, IMAP_PASS — placeholders)
+    .gitignore       (.venv, .env, __pycache__, cache files)
+    src/briefing/
+      cli.py
+      weather.py
+      news.py
+      mail.py
+      config.py
+      cache.py
+    README.md
+
+In the README, include a section "Scheduling it" with three short subsections:
+launchd, systemd --user, cron. Don't write the schedule files in this round —
+just describe them, with the exact command to enable each. I'll ask for the
+files when I'm ready.
+
+Dependencies: httpx, rich, python-dotenv, click. Nothing else.
+
+Before you start, summarize in three sentences. Then build it.</code></pre>
+    </div>
+
+    <h2>When something goes wrong</h2>
+    <ul>
+      <li><strong>Weather section says "no location set"</strong> — open <code>.env</code> and add <code>LAT=...</code> and <code>LON=...</code>. Google "lat lon &lt;your city&gt;" — Wikipedia usually has it.</li>
+      <li><strong>Email section says "AUTHENTICATIONFAILED"</strong> — you're using your real password instead of an app-specific one. Generate one from your provider's account settings.</li>
+      <li><strong>The script is slow</strong> — a flaky API. The cache means the second run will be instant. If one section is consistently slow, ask Claude to drop its timeout.</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Run it manually for a few days before you schedule it. You'll catch the small annoyances — wrong city, too many HN stories, whatever — while the code is still fresh in your head.</li>
+      <li>The <code>--json</code> flag is the secret weapon. Once you have it, you can pipe to <code>jq</code>, post to a webhook, or feed it back to Claude for a longer prose summary.</li>
+      <li>If you want a longer "what's in my day" summary, open Claude Code in the folder and ask: <em>"run <code>briefing --json</code>, then read it and write a one-paragraph human summary I can put in my journal."</em></li>
+    </ul>
+
+    <div class="callout" style="margin-top: 40px;">
+      <strong>Next up:</strong> <a href="04-money.html">Project 04 — Personal Money Dashboard →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/chlaudehelpme" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="../assets/copy.js"></script>
+</body>
+</html>

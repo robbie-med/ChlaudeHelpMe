@@ -280,4 +280,4 @@ In rough order:
 
 ---
 
-You now know more than 80% of people who claim to "use the terminal." Go [pick a project](./README.md#part-5--seven-copy-paste-projects) and build something.
+You now know more than 80% of people who claim to "use the terminal." Go [pick a project](./README.md#part-5--four-projects-zero-to-sixty) and build something. Start with [Project 1 — Folder Tidy](./projects/01-folder-tidy.md); it takes fifteen minutes and you'll learn the loop.

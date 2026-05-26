@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project 2 — Notes Search &amp; Q&amp;A — ChlaudeHelpMe</title>
+<meta name="description" content="Index a folder of markdown notes into SQLite full-text search. Ask Claude questions about your notes — no API key required." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="../index.html#setup">Setup</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/chlaudehelpme" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="project-hero">
+  <div class="prose">
+    <div class="num">Project 02</div>
+    <h1>Notes Search &amp; Q&amp;A</h1>
+    <p class="lede"><strong>About an hour.</strong> Your first multi-file project, with persistence. A CLI tool that indexes a folder of <code>.md</code> and <code>.txt</code> notes into SQLite full-text search, then lets you search them — and lets Claude Code answer questions across them using your existing login. <strong>No separate API key.</strong></p>
+    <p>This is what an actual program looks like: a few files in a folder, a virtual environment, a CLI with subcommands, and a database file that holds your data between runs.</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <h2>What you'll need</h2>
+    <ul>
+      <li>A folder of notes — <code>.md</code> and <code>.txt</code> files. Don't have one? Make a few right now:
+        <pre><code>mkdir -p ~/notes
+printf "# Coffee\nI like a single origin Ethiopian.\n" &gt; ~/notes/coffee.md
+printf "# Books\nReread East of Eden.\n" &gt; ~/notes/books.md</code></pre>
+      </li>
+      <li>Python 3.10+. Check with <code>python3 --version</code>.</li>
+    </ul>
+
+    <h2>Setup walkthrough</h2>
+    <ol class="steps">
+      <li><strong>Make and enter the project folder:</strong>
+        <pre><code>mkdir -p ~/projects/notes &amp;&amp; cd ~/projects/notes
+git init</code></pre>
+      </li>
+      <li><strong>Start Claude Code</strong> and paste the prompt below. Claude will set up a virtual environment, write the code, and walk you through the first index.</li>
+      <li><strong>Point it at your notes:</strong>
+        <pre><code>notes index ~/notes
+notes search "coffee"</code></pre>
+      </li>
+      <li><strong>Ask questions about your notes from inside Claude Code.</strong> Still in the project folder, start a fresh session (<code>/clear</code> or restart <code>claude</code>) and ask:
+        <blockquote>Use the <code>notes</code> CLI in this folder to answer: what have I written about books?</blockquote>
+        Claude will run <code>notes search "books"</code>, read the results, and answer in plain English.
+      </li>
+    </ol>
+
+    <h2>The prompt</h2>
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <span class="prompt-block-label">Paste into Claude Code</span>
+        <button class="copy-btn">Copy prompt</button>
+      </div>
+      <pre><code>Build a small command-line tool called `notes` that indexes markdown and text
+files into SQLite full-text search, and lets me search them.
+
+Keep it simple. Use only:
+- Python 3.10+ (standard library sqlite3, FTS5 is included)
+- `click` for the CLI
+- `watchdog` only if --watch is implemented
+
+Project layout:
+  notes/
+    pyproject.toml      (use a venv: python3 -m venv .venv &amp;&amp; pip install -e .)
+    src/notes/
+      __init__.py
+      cli.py
+      index.py
+      search.py
+    README.md
+    .gitignore          (ignore .venv, *.db)
+
+CLI:
+  notes index &lt;folder&gt;      Walk the folder, index every .md and .txt file.
+                            Incremental by default: only re-index files whose
+                            mtime is newer than what we have.
+  notes search "query"      Print top 10 hits. Each hit is: path, then the
+                            first matching line with a few words of context.
+  notes show &lt;path&gt;         Print a note's content.
+  notes stats               Number of notes, total words, when last indexed.
+
+Storage:
+- One SQLite file at ~/.local/share/notes/notes.db (configurable via $NOTES_DB).
+- An FTS5 virtual table with columns: path, body. Rebuild as needed.
+- A small `files` table to track (path, mtime, size) for incremental indexing.
+
+Hard requirements:
+- Read-only with respect to the notes folder. Never write to it.
+- Follow symlinks but don't loop (track visited inodes).
+- Skip files larger than 1 MB by default. Skip dotfiles.
+- If FTS5 isn't available, print a clear error and exit — don't try to fall
+  back to LIKE queries.
+
+README should explain:
+- How to install (cd into folder, make venv, pip install -e .)
+- The four commands above with an example
+- How to ask Claude questions about your notes by running `claude` in this
+  folder and pointing it at `notes search`
+
+Don't add a config file, don't add embeddings, don't add an MCP server. We'll
+do those in a later project if I ask. Build the smallest thing that works.
+
+Before you start, tell me in three sentences what you're about to build.
+Then make a TODO list and work through it. Commit after each file.</code></pre>
+    </div>
+
+    <h2>When something goes wrong</h2>
+    <ul>
+      <li><strong><code>notes: command not found</code></strong> — you didn't activate the venv, or the install didn't pick up the entry point. Try <code>source .venv/bin/activate</code> and re-run. Or run <code>python3 -m notes.cli ...</code>.</li>
+      <li><strong><code>no such module: fts5</code></strong> — your Python's SQLite was built without FTS5. On macOS this is rare; on Linux, install <code>sqlite3</code> via your package manager.</li>
+      <li><strong>Search returns nothing</strong> — did you index? Run <code>notes stats</code>. If it says zero notes, the path you passed to <code>index</code> was wrong.</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>The "ask Claude in the folder" trick is genuinely the point. Once the CLI works, your prompt becomes <em>"use the <code>notes</code> tool to answer..."</em> and Claude does the rest. This is the pattern for every project from here on.</li>
+      <li>Don't add embeddings yet. Lexical search is fast and explainable; you'll know when you need more.</li>
+    </ul>
+
+    <div class="callout" style="margin-top: 40px;">
+      <strong>Next up:</strong> <a href="03-briefing.html">Project 03 — Morning Briefing →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/chlaudehelpme" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="../assets/copy.js"></script>
+</body>
+</html>

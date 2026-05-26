@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project 1 — Folder Tidy — ChlaudeHelpMe</title>
+<meta name="description" content="Your first 15-minute Claude Code session. A single Python script that sorts a messy folder by file type." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b85042'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='500' fill='%23faf7f1' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html">Chlaude<span class="dot">·</span>HelpMe</a>
+    <div class="nav-links">
+      <a href="../index.html#setup">Setup</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../beginners.html">Beginners</a>
+      <a href="https://github.com/robbie-med/chlaudehelpme" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+<section class="project-hero">
+  <div class="prose">
+    <div class="num">Project 01</div>
+    <h1>Folder Tidy</h1>
+    <p class="lede"><strong>15 minutes.</strong> Your first real Claude Code session, end-to-end. A single Python script that sorts a messy folder into subfolders by file type. No APIs, no <code>.env</code>, no database — the smallest possible useful thing.</p>
+    <p>If you finish this in fifteen minutes and feel <em>"huh, that worked,"</em> you're ready for the next one.</p>
+  </div>
+</section>
+
+<section>
+  <div class="prose">
+    <h2>What you'll need</h2>
+    <ul>
+      <li>Claude Code installed and signed in (see the <a href="../index.html">main setup page</a>).</li>
+      <li>Python 3 (already on Mac and most Linux). Check with <code>python3 --version</code>.</li>
+      <li>A messy folder. We'll use <code>~/Downloads</code> as the example.</li>
+    </ul>
+
+    <h2>Setup walkthrough</h2>
+    <ol class="steps">
+      <li><strong>Make a project folder and step into it:</strong>
+        <pre><code>mkdir -p ~/projects/folder-tidy &amp;&amp; cd ~/projects/folder-tidy
+git init</code></pre>
+      </li>
+      <li><strong>Start Claude Code:</strong>
+        <pre><code>claude</code></pre>
+      </li>
+      <li><strong>Paste the prompt below</strong> as your first message. Claude will write <code>tidy.py</code> and a tiny README.</li>
+      <li><strong>Try it on a copy first.</strong> Make a throwaway folder so you can't break anything you care about:
+        <pre><code>mkdir -p ~/tidy-test
+cp ~/Downloads/* ~/tidy-test/ 2&gt;/dev/null
+python3 tidy.py ~/tidy-test --dry-run</code></pre>
+        Read the output. If it looks right, drop <code>--dry-run</code> and run it again.
+      </li>
+      <li><strong>Commit when it works:</strong>
+        <pre><code>git add . &amp;&amp; git commit -m "first working tidy"</code></pre>
+      </li>
+    </ol>
+
+    <h2>The prompt</h2>
+    <p>Copy this and paste it into Claude Code as your first message.</p>
+
+    <div class="prompt-block">
+      <div class="prompt-block-header">
+        <span class="prompt-block-label">Paste into Claude Code</span>
+        <button class="copy-btn">Copy prompt</button>
+      </div>
+      <pre><code>I want a single Python script called tidy.py that sorts files in a folder into
+subfolders by type. Keep it small — one file, standard library only, no
+dependencies to install.
+
+Usage:
+  python3 tidy.py &lt;folder&gt;            # actually move files
+  python3 tidy.py &lt;folder&gt; --dry-run  # print what would move, change nothing
+
+Behavior:
+- Group by file extension into these subfolders, created on demand:
+    Images/   (.jpg .jpeg .png .gif .heic .webp)
+    Videos/   (.mp4 .mov .mkv .webm)
+    Audio/    (.mp3 .m4a .wav .flac)
+    Docs/     (.pdf .docx .xlsx .pptx .txt .md .csv)
+    Archives/ (.zip .tar .gz .7z .dmg)
+    Code/     (.py .js .ts .html .css .json .sh)
+    Other/    (everything else)
+- Only touch files in the top level of the folder. Don't recurse.
+- Skip hidden files (leading dot) and skip the subfolders you created.
+- If the destination already has a file with the same name, append " (1)",
+  " (2)", etc.
+
+Then write a short README.md with: what it does, how to run it, and the
+dry-run warning ("always dry-run first").
+
+Before you write anything, tell me in two sentences what you're about to do.
+Then write the files. Don't ask me a long list of questions — keep it tight.</code></pre>
+    </div>
+
+    <h2>When something goes wrong</h2>
+    <ul>
+      <li><strong><code>python3: command not found</code></strong> — install Python from <a href="https://python.org" target="_blank" rel="noopener">python.org</a> or your package manager. Close and reopen the terminal.</li>
+      <li><strong>Claude moved files you didn't want moved</strong> — that's why we ran <code>--dry-run</code> first. If it happened anyway, ask Claude to write an <code>undo.py</code> that reverses the last run. Better: keep dry-run as your default for a while.</li>
+      <li><strong>A file refused to move</strong> — likely permissions or it's open in another app. Ask Claude what the error means.</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Don't add features yet. Resist "make it also rename screenshots" or "and also organize by date." Future projects do that. The point of this one is to feel the whole loop, fast.</li>
+      <li>Get comfortable hitting <code>/clear</code> after this. Each new project starts fresh.</li>
+    </ul>
+
+    <div class="callout" style="margin-top: 40px;">
+      <strong>Next up:</strong> <a href="02-notes.html">Project 02 — Notes Search &amp; Q&amp;A →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>ChlaudeHelpMe — a community starter kit. Not affiliated with Anthropic.</div>
+    <div><a href="https://github.com/robbie-med/chlaudehelpme" target="_blank" rel="noopener">View source</a></div>
+  </div>
+</footer>
+
+<script src="../assets/copy.js"></script>
+</body>
+</html>

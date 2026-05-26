@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ChlaudeHelpMe — A friendly on-ramp to Claude Code</title>
-<meta name="description" content="Install Claude Code on Mac or Linux in five minutes. Seven copy-paste projects that turn your terminal into a personal assistant. No programming experience required." />
+<meta name="description" content="Install Claude Code on Mac or Linux in five minutes. Four copy-paste projects that take you from zero to sixty. No programming experience required." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -31,7 +31,7 @@
   <div class="prose">
     <div class="eyebrow">A starter kit for Claude Code</div>
     <h1>A friendly on-ramp to <span class="accent">Claude Code.</span></h1>
-    <p class="lede">Install in five minutes. Build something real in an hour. Seven copy-paste projects that turn your terminal into a personal assistant — no programming experience required.</p>
+    <p class="lede">Install in five minutes. Build something real in fifteen. Four copy-paste projects that take you from zero to sixty — your first one-shot script to a background sync daemon Claude Desktop can query in plain English. No programming experience required.</p>
     <div class="cta-row">
       <a href="#setup" class="btn primary">Get started <span class="arrow">→</span></a>
       <a href="beginners.html" class="btn secondary">First time? Read this</a>
@@ -166,56 +166,35 @@ cd ~/projects/hello-claude</code></pre>
   <div class="container">
     <div class="section-divider"></div>
     <div class="eyebrow">Part 5</div>
-    <h2>Seven projects to try</h2>
-    <p class="lede" style="font-size: 19px; max-width: 720px;">Each one has a setup walkthrough and a long, careful copy-paste prompt. Built to produce real, useful tools — not toys.</p>
+    <h2>Four projects, zero to sixty</h2>
+    <p class="lede" style="font-size: 19px; max-width: 720px;">Each project builds on the last. Project 1 is fifteen minutes with no setup. Project 4 is a weekend that leaves you with a real personal tool Claude Desktop can query in plain English.</p>
 
     <div class="project-grid">
-      <a class="card" href="projects/01-finance-helper.html">
-        <div class="num">Project 01</div>
-        <h3>Personal Finance Helper</h3>
-        <p>Pulls your bank transactions locally, categorizes them, lets Claude answer "where did my money actually go this month?" — without sending data anywhere you didn't choose.</p>
+      <a class="card" href="projects/01-folder-tidy.html">
+        <div class="num">Project 01 · 15 min</div>
+        <h3>Folder Tidy</h3>
+        <p>Your first real Claude Code session. One Python script that sorts a messy folder by file type. No APIs, no <code>.env</code>, no database. Feel the loop.</p>
         <div class="open">Open project <span class="arrow">→</span></div>
       </a>
 
-      <a class="card" href="projects/02-downloads-organizer.html">
-        <div class="num">Project 02</div>
-        <h3>Smart Downloads Organizer</h3>
-        <p>A background service that sorts your Downloads folder by type and date, with optional AI classification for ambiguous files. Safe, reversible, rule-driven.</p>
+      <a class="card" href="projects/02-notes.html">
+        <div class="num">Project 02 · 1 hour</div>
+        <h3>Notes Search &amp; Q&amp;A</h3>
+        <p>Index a folder of markdown notes into SQLite full-text search. Ask Claude questions about them inside the project folder. No separate API key required.</p>
         <div class="open">Open project <span class="arrow">→</span></div>
       </a>
 
-      <a class="card" href="projects/03-knowledge-base.html">
-        <div class="num">Project 03</div>
-        <h3>Personal Knowledge Base</h3>
-        <p>Index your markdown notes — Obsidian, Bear, Apple Notes exports — and ask Claude questions across all of them. Citations to the exact note and line.</p>
+      <a class="card" href="projects/03-briefing.html">
+        <div class="num">Project 03 · an evening</div>
+        <h3>Morning Briefing</h3>
+        <p>One command: weather, top headlines, and (optionally) your unread email count. Meet <code>.env</code> files, app-specific passwords, and scheduled background runs.</p>
         <div class="open">Open project <span class="arrow">→</span></div>
       </a>
 
-      <a class="card" href="projects/04-daily-briefing.html">
-        <div class="num">Project 04</div>
-        <h3>Daily Briefing Generator</h3>
-        <p>One command, one screen: weather, today's calendar, unread email summary, news headlines. Scheduled for 7am, printed with your coffee.</p>
-        <div class="open">Open project <span class="arrow">→</span></div>
-      </a>
-
-      <a class="card" href="projects/05-meal-planner.html">
-        <div class="num">Project 05</div>
-        <h3>Meal Planner & Grocery List</h3>
-        <p>Knows what's already in your pantry. Plans a week of meals that minimize waste, exports a deduplicated grocery list to Reminders or Todoist.</p>
-        <div class="open">Open project <span class="arrow">→</span></div>
-      </a>
-
-      <a class="card" href="projects/06-photo-dedupe.html">
-        <div class="num">Project 06</div>
-        <h3>Photo Library Deduplicator</h3>
-        <p>Find duplicates and near-duplicates safely. Review side-by-side previews. Moves dupes to a holding folder — never deletes. Fully reversible.</p>
-        <div class="open">Open project <span class="arrow">→</span></div>
-      </a>
-
-      <a class="card" href="projects/07-habit-tracker.html">
-        <div class="num">Project 07</div>
-        <h3>Habit & Mood Tracker</h3>
-        <p>A small, beautiful terminal app. SQLite-backed. Daily check-in in ten seconds. Weekly review with charts and an optional Claude-written reflection.</p>
+      <a class="card" href="projects/04-money.html">
+        <div class="num">Project 04 · a weekend</div>
+        <h3>Personal Money Dashboard</h3>
+        <p>SimpleFIN sync daemon + SQLite + an MCP server. Claude Desktop answers <em>"where did my money go in March?"</em> from your real data. Includes the secret-handling safety hack.</p>
         <div class="open">Open project <span class="arrow">→</span></div>
       </a>
     </div>
